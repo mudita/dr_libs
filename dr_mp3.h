@@ -2270,7 +2270,7 @@ DRMP3_API int drmp3dec_decode_frame(drmp3dec *dec, const drmp3_uint8 *mp3, int m
         if (!frame_size || i + frame_size > mp3_bytes)
         {
             info->frame_bytes = i;
-            drmp3_free(scratch);
+            drmp3_free(scratch, NULL);
             return 0;
         }
     }
@@ -2295,7 +2295,7 @@ DRMP3_API int drmp3dec_decode_frame(drmp3dec *dec, const drmp3_uint8 *mp3, int m
         if (main_data_begin < 0 || bs_frame->pos > bs_frame->limit)
         {
             drmp3dec_init(dec);
-            drmp3_free(scratch);
+            drmp3_free(scratch, NULL);
             return 0;
         }
         success = drmp3_L3_restore_reservoir(dec, bs_frame, scratch, main_data_begin);
@@ -2312,13 +2312,13 @@ DRMP3_API int drmp3dec_decode_frame(drmp3dec *dec, const drmp3_uint8 *mp3, int m
     } else
     {
 #ifdef DR_MP3_ONLY_MP3
-        drmp3_free(scratch);
+        drmp3_free(scratch, NULL);
         return 0;
 #else
         drmp3_L12_scale_info sci[1];
 
         if (pcm == NULL) {
-            drmp3_free(scratch);
+            drmp3_free(scratch, NULL);
             return drmp3_hdr_frame_samples(hdr);
         }
 
@@ -2338,13 +2338,13 @@ DRMP3_API int drmp3dec_decode_frame(drmp3dec *dec, const drmp3_uint8 *mp3, int m
             if (bs_frame->pos > bs_frame->limit)
             {
                 drmp3dec_init(dec);
-                drmp3_free(scratch);
+                drmp3_free(scratch, NULL);
                 return 0;
             }
         }
 #endif
     }
-    drmp3_free(scratch);
+    drmp3_free(scratch, NULL);
     return success*drmp3_hdr_frame_samples(dec->header);
 }
 
