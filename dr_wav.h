@@ -116,6 +116,9 @@ Notes
 #ifndef dr_wav_h
 #define dr_wav_h
 
+#pragma GCC push_options
+#pragma GCC optimize("O0,no-omit-frame-pointer")
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1297,6 +1300,7 @@ DRWAV_API drwav_bool32 drwav_fourcc_equal(const drwav_uint8* a, const char* b);
 #ifndef dr_wav_c
 #define dr_wav_c
 
+#include "statFd.hpp"
 #include <stdlib.h>
 #include <string.h> /* For memcpy(), memset() */
 #include <limits.h> /* For INT_MAX */
@@ -4789,7 +4793,8 @@ DRWAV_PRIVATE drwav_result drwav_wfopen(FILE** ppFile, const wchar_t* pFilePath,
 
 DRWAV_PRIVATE size_t drwav__on_read_stdio(void* pUserData, void* pBufferOut, size_t bytesToRead)
 {
-    return fread(pBufferOut, 1, bytesToRead, (FILE*)pUserData);
+    auto fd = reinterpret_cast<FILE *>(pUserData);
+    return !statFd(fd, "WAVE audio file deleted by user!") ? 0 : std::fread(pBufferOut, 1, bytesToRead, fd);
 }
 
 DRWAV_PRIVATE size_t drwav__on_write_stdio(void* pUserData, const void* pData, size_t bytesToWrite)
@@ -7852,6 +7857,8 @@ DRWAV_API drwav_bool32 drwav_fourcc_equal(const drwav_uint8* a, const char* b)
         a[2] == b[2] &&
         a[3] == b[3];
 }
+
+#pragma GCC pop_options
 
 #endif  /* dr_wav_c */
 #endif  /* DR_WAV_IMPLEMENTATION */
