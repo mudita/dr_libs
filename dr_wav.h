@@ -1297,7 +1297,6 @@ DRWAV_API drwav_bool32 drwav_fourcc_equal(const drwav_uint8* a, const char* b);
 #ifndef dr_wav_c
 #define dr_wav_c
 
-#include "statFd.hpp"
 #include <stdlib.h>
 #include <string.h> /* For memcpy(), memset() */
 #include <limits.h> /* For INT_MAX */
@@ -4790,8 +4789,7 @@ DRWAV_PRIVATE drwav_result drwav_wfopen(FILE** ppFile, const wchar_t* pFilePath,
 
 DRWAV_PRIVATE size_t drwav__on_read_stdio(void* pUserData, void* pBufferOut, size_t bytesToRead)
 {
-    auto fd = reinterpret_cast<FILE *>(pUserData);
-    return !statFd(fd, "WAVE audio file deleted by user!") ? 0 : std::fread(pBufferOut, 1, bytesToRead, fd);
+    return fread(pBufferOut, 1, bytesToRead, (FILE*)pUserData);
 }
 
 DRWAV_PRIVATE size_t drwav__on_write_stdio(void* pUserData, const void* pData, size_t bytesToWrite)
